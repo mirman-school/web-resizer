@@ -1,6 +1,6 @@
 #!/bin/bash
-imagedir=$1
-cd $imagedir
+imagedir="$1"
+cd "$imagedir"
 LIST="$(ls | egrep '\.(png|gif|jpg|jpeg)')"
 mkdir Web_Full
 mkdir Web_Thumb
