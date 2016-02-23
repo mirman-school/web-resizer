@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+require "pathname"
+require "fileutils"
+require "shellwords"
+
+def shellsafe(path)
+	"#{path}".shellescape
+end
+
+def resize(path)
+	image_path = Pathname.new(path)
+	puts "Working on #{image_path}"
+	if image_path.directory?
+		contents = image_path.each_child
+		puts "Directory; moving in"
+		contents.each do |c|
+			resize(c)
+		end
+	elsif image_path.file? && /\.jpg|\.jpeg|\.png|.gif/ =~ image_path.extname
+		puts "It's an image; creating web sizes"
+		full_image = image_path.dirname.join("fullsize-#{image_path.basename}")
+		thumb_image = image_path.dirname.join("thumb-#{image_path.basename}")
+		FileUtils.copy(image_path, full_image)
+		FileUtils.copy(image_path, thumb_image)
+		`sips -Z 800 #{shellsafe(full_image)}`
+		`sips -Z 200 #{shellsafe(thumb_image)}`
+	else	
+		puts "Not a file dummy!"	
+	end
+end
+
+ARGV.each do |arg|
+	resize(arg)
+end
+
